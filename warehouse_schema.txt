@@ -1,0 +1,146 @@
+-- Creating tables for the warehouse management system based on the provided logical design
+
+-- Role Table
+CREATE TABLE Role (
+    Role_ID VARCHAR(50) PRIMARY KEY,
+    Role_Name VARCHAR(100) NOT NULL
+);
+
+-- Employee Table
+CREATE TABLE Employee (
+    Employee_ID VARCHAR(50) PRIMARY KEY,
+    Role_ID VARCHAR(50) NOT NULL,
+    First_Name VARCHAR(50) NOT NULL,
+    Last_Name VARCHAR(50) NOT NULL,
+    Warehouse_ID VARCHAR(50),
+    FOREIGN KEY (Role_ID) REFERENCES Role(Role_ID)
+);
+
+-- Customer Table
+CREATE TABLE Customer (
+    Customer_ID VARCHAR(50) PRIMARY KEY,
+    First_Name VARCHAR(50) NOT NULL,
+    Last_Name VARCHAR(50) NOT NULL,
+    Street VARCHAR(100),
+    City VARCHAR(50),
+    Postcode VARCHAR(20)
+);
+
+-- Order Table
+CREATE TABLE `Order` (
+    Order_ID VARCHAR(50) PRIMARY KEY,
+    Customer_ID VARCHAR(50) NOT NULL,
+    Employee_ID VARCHAR(50) NOT NULL,
+    Order_Status VARCHAR(50) NOT NULL,
+    Order_Date DATE NOT NULL,
+    FOREIGN KEY (Customer_ID) REFERENCES Customer(Customer_ID),
+    FOREIGN KEY (Employee_ID) REFERENCES Employee(Employee_ID)
+);
+
+-- Category Table
+CREATE TABLE Category (
+    Category_ID VARCHAR(50) PRIMARY KEY,
+    Category_Name VARCHAR(100) NOT NULL
+);
+
+-- Product Table
+CREATE TABLE Product (
+    Product_ID VARCHAR(50) PRIMARY KEY,
+    Category_ID VARCHAR(50) NOT NULL,
+    Product_Name VARCHAR(100) NOT NULL,
+    Expiration_Date DATE,
+    FOREIGN KEY (Category_ID) REFERENCES Category(Category_ID)
+);
+
+-- Warehouse Table
+CREATE TABLE Warehouse (
+    Warehouse_ID VARCHAR(50) PRIMARY KEY,
+    Warehouse_Name VARCHAR(100) NOT NULL
+);
+
+-- Location Table
+CREATE TABLE Location (
+    Location_ID VARCHAR(50) PRIMARY KEY,
+    Warehouse_ID VARCHAR(50) NOT NULL,
+    Location_Description VARCHAR(200),
+    FOREIGN KEY (Warehouse_ID) REFERENCES Warehouse(Warehouse_ID)
+);
+
+-- Inventory Management Table
+CREATE TABLE Inventory_Management (
+    Employee_ID VARCHAR(50),
+    Product_ID VARCHAR(50),
+    Stock_Level INT NOT NULL,
+    PRIMARY KEY (Employee_ID, Product_ID),
+    FOREIGN KEY (Employee_ID) REFERENCES Employee(Employee_ID),
+    FOREIGN KEY (Product_ID) REFERENCES Product(Product_ID)
+);
+
+-- Product Movement Table
+CREATE TABLE Product_Movement (
+    Movement_ID VARCHAR(50) PRIMARY KEY,
+    Product_ID VARCHAR(50) NOT NULL,
+    Employee_ID VARCHAR(50) NOT NULL,
+    Location_ID VARCHAR(50) NOT NULL,
+    Movement_Type VARCHAR(50) NOT NULL,
+    Movement_Date DATE NOT NULL,
+    FOREIGN KEY (Product_ID) REFERENCES Product(Product_ID),
+    FOREIGN KEY (Employee_ID) REFERENCES Employee(Employee_ID),
+    FOREIGN KEY (Location_ID) REFERENCES Location(Location_ID)
+);
+
+-- Vehicle Table
+CREATE TABLE Vehicle (
+    Vehicle_ID VARCHAR(50) PRIMARY KEY,
+    Vehicle_Description VARCHAR(200)
+);
+
+-- Shipment Table
+CREATE TABLE Shipment (
+    Shipment_ID VARCHAR(50) PRIMARY KEY,
+    Order_ID VARCHAR(50) NOT NULL,
+    Vehicle_ID VARCHAR(50) NOT NULL,
+    Delivery_Status VARCHAR(50) NOT NULL,
+    Delivery_Date DATE,
+    FOREIGN KEY (Order_ID) REFERENCES `Order`(Order_ID),
+    FOREIGN KEY (Vehicle_ID) REFERENCES Vehicle(Vehicle_ID)
+);
+
+-- Order Item Table
+CREATE TABLE Order_Item (
+    Order_ID VARCHAR(50),
+    Product_ID VARCHAR(50),
+    Quantity INT NOT NULL,
+    PRIMARY KEY (Order_ID, Product_ID),
+    FOREIGN KEY (Order_ID) REFERENCES `Order`(Order_ID),
+    FOREIGN KEY (Product_ID) REFERENCES Product(Product_ID)
+);
+
+-- Tracking Table
+CREATE TABLE Tracking (
+    Tracking_ID VARCHAR(50) PRIMARY KEY,
+    Shipment_ID VARCHAR(50) NOT NULL,
+    Last_Updated DATETIME NOT NULL,
+    Current_Location VARCHAR(200),
+    FOREIGN KEY (Shipment_ID) REFERENCES Shipment(Shipment_ID)
+);
+
+-- Security and Safety Table
+CREATE TABLE Security_Safety (
+    Employee_ID VARCHAR(50),
+    Order_ID VARCHAR(50),
+    Incident_Details TEXT,
+    PRIMARY KEY (Employee_ID, Order_ID),
+    FOREIGN KEY (Employee_ID) REFERENCES Employee(Employee_ID),
+    FOREIGN KEY (Order_ID) REFERENCES `Order`(Order_ID)
+);
+
+-- Access and Permissions Table
+CREATE TABLE Access_Permissions (
+    Employee_ID VARCHAR(50),
+    Role_ID VARCHAR(50),
+    Access_Level VARCHAR(50) NOT NULL,
+    PRIMARY KEY (Employee_ID, Role_ID),
+    FOREIGN KEY (Employee_ID) REFERENCES Employee(Employee_ID),
+    FOREIGN KEY (Role_ID) REFERENCES Role(Role_ID)
+);
